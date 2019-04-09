@@ -27,6 +27,9 @@ swagger_config = {
                 "produces": [
                     "application/json"
                 ], 
+                "consumes": [
+                    "application/json",
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -36,11 +39,14 @@ swagger_config = {
                     },
                     "400": {
                         "description": "Invalid username/password supplied"
+                    },
+                    "401": {
+                        "description": "Basic realm='Login Required'"
                     }
                 },
                 "security": {
                     'basicAuth': []
-                }
+                } 
             }
         },
         "/user": {

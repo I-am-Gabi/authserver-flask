@@ -27,7 +27,7 @@ def check_permission(permission, username):
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
-    return jsonify({'WWW-Authenticate': 'Basic realm=Login Required'}), 401
+    return jsonify({'WWW-Authenticate': "Basic realm='Login Required'"}), 401
 
 def login_required(f):
     @wraps(f)

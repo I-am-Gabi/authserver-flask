@@ -8,6 +8,8 @@ from swagger import swagger_config
 from .blueprints.user import user_blueprint
 from .utils.encoders import CustomJsonEncoder
 
+from annotations.auth import login_required
+
 def create_app(mode):
     instance_path = path.join(
         path.abspath(path.dirname(__file__)), '%s_instance' % mode
