@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_restful import Api
+
 from flasgger import Swagger
 from .db import db  
 
@@ -18,20 +20,20 @@ def create_app(mode):
     app = Flask('api',
                 instance_path=instance_path,
                 instance_relative_config=True)
+    api = Api(app)
 
     app.config.from_object('api.default_settings')
     app.config.from_pyfile('config.cfg')
+    app.config['SWAGGER'] = {
+        'title': 'AuthServer RESTful',
+        'uiversion': 1
+    }
+    swagger = Swagger(app, template=swagger_config)
 
     app.register_blueprint(user_blueprint)
-
-    app.logger.propagate = True
-
-    db.init_app(app)
-
-    app.logger.propagate = True
+ 
+    db.init_app(app) 
 
     app.json_encoder = CustomJsonEncoder
  
-    swagger = Swagger(app, template=swagger_config)
-
     return app
