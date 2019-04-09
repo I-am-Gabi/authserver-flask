@@ -7,6 +7,9 @@ from flask import (
 from ..models import User  
 from flask_httpauth import HTTPBasicAuth
 from functools import wraps
+
+from ..utils.token import validate_token
+import tokenlib
  
 def check_auth(username, password):
     """This function is called to check if a username /
@@ -29,14 +32,25 @@ def authenticate():
     """Sends a 401 response that enables basic auth"""
     return jsonify({'WWW-Authenticate': 'Basic realm=Login Required'}), 401
 
+def make_login(username, password):  
+    valid = check_auth(username, password)
+    if not valid:
+        return None
+    session['username'] = username
+    session['token'] = tokenlib.make_token({"username": username}, secret="AUTH_SERVER")
+    return session['token']
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth = request.authorization 
-        valid = check_auth(auth.username, auth.password)
+        if session["username"]:
+            return jsonify({'error': "user already logged"}), 200
+        
+        valid = check_auth(username, password)
         if not auth or not valid and not session['username']:
             return authenticate()
-        session['username'] = auth.username
+        session['username'] = username
+        session['token'] = tokenlib.make_token({"username": username}, secret="AUTH_SERVER")
         return f(*args, **kwargs)
     return decorated
 
@@ -45,7 +59,7 @@ def roles_accepted(permission):
         @wraps(f)                               
         def decorated(*args,**kwargs):   
             auth = request.authorization 
-            if not check_permission(permission, auth.username):
+            if not check_permission(permission, username):
                 return jsonify({'error': "you don't have authorization"}), 401                          
             return f(*args,**kwargs)            
         return decorated                                          

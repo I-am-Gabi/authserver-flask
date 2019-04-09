@@ -30,6 +30,9 @@ swagger_config = {
                 "responses": {
                     "200": {
                         "description": "successful operation",
+                        "token": {
+                            "type": "string"
+                        },
                         "schema": {
                             "type": "string"
                         }, 
@@ -38,9 +41,15 @@ swagger_config = {
                         "description": "Invalid username/password supplied"
                     }
                 },
-                "security": {
-                    'basicAuth': []
-                }
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "body",
+                        "description": "The user name for login",
+                        "required": True,
+                        "type": "string"
+                    }, 
+                ],
             }
         },
         "/user": {
@@ -175,7 +184,44 @@ swagger_config = {
                     }
                 }
             }
-        }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Logs user into the system",
+                "description": "",
+                "operationId": "loginUser",
+                "produces": [
+                    "application/json", 
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "The user name for login",
+                        "required": True,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "The password for login in clear text",
+                        "required": True,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation", 
+                    },
+                    "400": {
+                        "description": "Invalid username/password supplied"
+                    }
+                }
+            }
+        },
     },
     "definitions": {
         "User": {
@@ -218,8 +264,10 @@ swagger_config = {
         }
     },
     'securityDefinitions': {
-        'basicAuth': {
-            'type': 'basic'
+        'Bearer': {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
         }
     },
     "externalDocs": {

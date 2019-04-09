@@ -6,8 +6,10 @@ from flask import (
     Blueprint, request, current_app, send_from_directory, jsonify, session
 ) 
 from ..models import User 
-from ..annotations.auth import login_required, roles_accepted
+from ..annotations.auth import login_required, roles_accepted, make_login
 from flasgger import swag_from 
+from ..utils.token import validate_token, create_token
+
 
 logger = logging.getLogger(__name__)
 user_blueprint = Blueprint('user', __name__, url_prefix="/api")
@@ -41,6 +43,9 @@ def delete_user(username):
 
 @user_blueprint.route("/user", methods=["POST"])    
 def create_user():
+    token = request.headers.get('Authorization').split(' ')[1]
+    print(token)
+
     content = request.json
     username = content.get('username')
     email = content.get('email')
@@ -59,16 +64,40 @@ def create_user():
 
     return jsonify({'username': username}), 201
 
-@user_blueprint.route("/login", methods=["POST"])
-@login_required   
-def login(): 
-    if session["username"]:
-        return jsonify({'error': "user already logged"}), 200
-    return jsonify({'login': True}), 201
 
-@user_blueprint.route('/logout')
-@login_required
+@user_blueprint.route("/login", methods=["POST"]) 
+def login():  
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    result = make_login(username, password)
+    if not result:
+        return jsonify({'WWW-Authenticate': 'Basic realm=Login Required'}), 401
+    
+    resp = jsonify({"message": "User authenticated"})
+    resp.status_code = 200
+    resp.headers.extend({'token': result})
+    return resp
+
+@user_blueprint.route('/logout', methods=["POST"])
+#@login_required
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
+    session.pop('token', None)
+    return jsonify({'logout': True}), 201
+
+@user_blueprint.route('/token/refresh', methods=["POST"]) 
+def token_refresh():
+    # remove the username from the session if it's there
+    if session.get('username'):
+        data_token = session['token']
+        token = str(data_token['key'])
+        if validate_token(token):
+            return token
+        else:
+            token = create_token(session.get('username'))
+            session[token] = token
+            return token
+
     return jsonify({'logout': True}), 201
