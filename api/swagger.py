@@ -43,10 +43,7 @@ swagger_config = {
                     "401": {
                         "description": "Basic realm='Login Required'"
                     }
-                },
-                "security": {
-                    'basicAuth': []
-                } 
+                }, 
             }
         },
         "/user": {
@@ -181,7 +178,64 @@ swagger_config = {
                     }
                 }
             }
-        }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Logs user into the system",
+                "description": "",
+                "operationId": "loginUser",
+                "produces": [
+                    "application/json", 
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "The user name for login",
+                        "required": True,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "The password for login in clear text",
+                        "required": True,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation", 
+                    },
+                    "400": {
+                        "description": "Invalid username/password supplied"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Logs out current logged in user session",
+                "description": "",
+                "operationId": "logoutUser",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
     },
     "definitions": {
         "User": {
@@ -222,12 +276,7 @@ swagger_config = {
                 }
             }
         }
-    },
-    'securityDefinitions': {
-        'basicAuth': {
-            'type': 'basic'
-        }
-    },
+    }, 
     "externalDocs": {
         "description": "Find out more about the project.",
         "url": "https://github.com/I-am-Gabi/authserver-flask"

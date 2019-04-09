@@ -37,9 +37,9 @@ def delete_user(username):
         return jsonify({'error': "user doesn't exist"}), 400
 
     user = User.objects.get(username=username).delete()
-    return jsonify({'username': username}), 400
+    return jsonify({'username': username}), 200
 
-@user_blueprint.route("/user", methods=["POST"])    
+@user_blueprint.route("/user", methods=["POST"])    f
 def create_user():
     content = request.json
     username = content.get('username')
@@ -63,6 +63,7 @@ def create_user():
 def login(): 
     if session.get("username"):
         return jsonify({'error': "user already logged. make logout"}), 200
+    
     if make_login():
         return jsonify({'login': True}), 201
     else: 
