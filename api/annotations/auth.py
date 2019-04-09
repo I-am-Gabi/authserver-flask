@@ -27,14 +27,22 @@ def check_permission(permission, username):
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
-    return jsonify({'WWW-Authenticate': "Basic realm='Login Required'"}), 401
+    return jsonify({'error': "bad authorization info"}), 401
+
+def make_login():
+    auth = request.authorization 
+    valid = check_auth(auth.username, auth.password)
+    if not auth or not valid:
+        return False
+    session['username'] = auth.username
+    return True
 
 def login_required(f):
     @wraps(f)
-    def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs): 
         auth = request.authorization 
         valid = check_auth(auth.username, auth.password)
-        if not auth or not valid and not session['username']:
+        if not auth or not valid or not session.get('username'):
             return authenticate()
         session['username'] = auth.username
         return f(*args, **kwargs)

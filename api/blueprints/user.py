@@ -6,7 +6,7 @@ from flask import (
     Blueprint, request, current_app, send_from_directory, jsonify, session
 ) 
 from ..models import User 
-from ..annotations.auth import login_required, roles_accepted
+from ..annotations.auth import login_required, roles_accepted, make_login
 from flasgger import swag_from 
 
 logger = logging.getLogger(__name__)
@@ -59,15 +59,16 @@ def create_user():
 
     return jsonify({'username': username}), 201
 
-@user_blueprint.route("/login", methods=["POST"])
-@login_required   
+@user_blueprint.route("/login", methods=["POST"]) 
 def login(): 
-    if session["username"]:
-        return jsonify({'error': "user already logged"}), 200
-    return jsonify({'login': True}), 201
+    if session.get("username"):
+        return jsonify({'error': "user already logged. make logout"}), 200
+    if make_login():
+        return jsonify({'login': True}), 201
+    else: 
+        return jsonify({'error': "error to loggin"}), 401
 
-@user_blueprint.route('/logout')
-@login_required
+@user_blueprint.route('/logout', methods=["POST"])
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
