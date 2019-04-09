@@ -5,8 +5,16 @@ from .db import db
 from os import path
 
 from swagger import swagger_config
-from .blueprints.cart import user_blueprint
+from .apps.user import user_blueprint 
 from .utils.encoders import CustomJsonEncoder
+
+from flask_spyne import Spyne 
+from spyne.protocol.soap import Soap11
+from spyne.model.primitive import Unicode, Integer
+from spyne.model.complex import Iterable 
+from werkzeug.wsgi import DispatcherMiddleware
+from spyne.server.wsgi import WsgiApplication
+from .apps.user_soap import create_soap_app
 
 def create_app(mode):
     instance_path = path.join(
@@ -31,5 +39,11 @@ def create_app(mode):
     app.json_encoder = CustomJsonEncoder
  
     swagger = Swagger(app, template=swagger_config)
+
+    # SOAP services are distinct wsgi applications, we should use dispatcher
+    # middleware to bring all aps together
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/soap': WsgiApplication(create_soap_app(app))
+    })
 
     return app

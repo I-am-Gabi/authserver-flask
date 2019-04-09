@@ -1,7 +1,7 @@
 swagger_config = {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.",
+        "description": "This is a sample authentication server.  You can find out more about the project at [https://github.com/I-am-Gabi/authserver-flask).",
         "version": "1.0.0",
         "title": "AuthServer API"
     },

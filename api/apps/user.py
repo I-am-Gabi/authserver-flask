@@ -6,7 +6,7 @@ from flask import (
     Blueprint, request, current_app, send_from_directory, jsonify
 ) 
 from ..models import User 
-rom flasgger import swag_from 
+from flasgger import swag_from 
 
 logger = logging.getLogger(__name__)
 user_blueprint = Blueprint('user', __name__, url_prefix="/api")
@@ -14,7 +14,7 @@ user_blueprint = Blueprint('user', __name__, url_prefix="/api")
 @user_blueprint.route("/users", methods=["GET"]) 
 def get_users():
     users = User.objects.all()
-    return jsonify({'users': users}), 400
+    return jsonify({'users': users}), 200
 
 
 @user_blueprint.route("/user", methods=["GET"])  
@@ -26,14 +26,14 @@ def get_user():
         
         user = User.objects.get(_id=ObjectId(user_id))  
 
-    return jsonify({'user_id': user}), 400
+    return jsonify({'user_id': user}), 200
 
 @user_blueprint.route("/user/<username>", methods=["DELETE"])  
 def delete_user(username): 
     if username: 
         user = User.objects.get(username=username).delete()
 
-    return jsonify({'status': "ok"}), 400
+    return jsonify({'status': "ok"}), 200
 
 @user_blueprint.route("/user", methods=["POST"])   
 def create_user():
@@ -47,4 +47,4 @@ def create_user():
     user = User(username=username, email=email, password=password)
     user.save()
 
-    return jsonify({'status': "ok"}), 400
+    return jsonify({'status': "ok"}), 200
