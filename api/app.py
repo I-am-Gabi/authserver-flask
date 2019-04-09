@@ -5,7 +5,7 @@ from .db import db
 from os import path
 
 from swagger import swagger_config
-from .blueprints.cart import user_blueprint
+from .blueprints.user import user_blueprint
 from .utils.encoders import CustomJsonEncoder
 
 def create_app(mode):
