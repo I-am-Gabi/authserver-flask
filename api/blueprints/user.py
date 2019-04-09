@@ -42,10 +42,7 @@ def delete_user(username):
     return jsonify({'username': username}), 400
 
 @user_blueprint.route("/user", methods=["POST"])    
-def create_user():
-    token = request.headers.get('Authorization').split(' ')[1]
-    print(token)
-
+def create_user():  
     content = request.json
     username = content.get('username')
     email = content.get('email')
@@ -80,7 +77,6 @@ def login():
     return resp
 
 @user_blueprint.route('/logout', methods=["POST"])
-#@login_required
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
@@ -91,13 +87,12 @@ def logout():
 def token_refresh():
     # remove the username from the session if it's there
     if session.get('username'):
-        data_token = session['token']
+        data_token = request.headers.get('Authorization')
         token = str(data_token['key'])
-        if validate_token(token):
+        if validate_token(token, session['token']):
             return token
         else:
-            token = create_token(session.get('username'))
-            session[token] = token
+            token = create_token(session.get('username')) 
             return token
 
     return jsonify({'logout': True}), 201
